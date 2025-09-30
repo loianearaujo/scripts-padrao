@@ -1,5 +1,12 @@
 # Scripts Padrão
 
+## COMO USAR
+
+Quando e IA executar o script, vai aparecer no terminal bash 4 opções.
+- Se quiser digitar novas instruções, aperte `4`
+- Digite o que precisa e pode quebrar linhas com o `Enter` se quiser
+- Quando terminar de digitar, tecle `Ctrl` + `C`
+
 Scripts de alta performance para configurações, testes e verificações gerais de sistemas.
 
 ## 📁 Estrutura
