@@ -29,8 +29,8 @@ case "$opcao" in
         exit 3
         ;;
     "4")
-        echo "📝 Digite seu texto (Ctrl + C para finalizar):"
-        texto=$(cat)
+        if result=$(vim_text_editor); then
+            response="$result"
 
         if [ -n "$texto" ]; then
             echo ""
