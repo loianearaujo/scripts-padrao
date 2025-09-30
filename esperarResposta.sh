@@ -1,20 +1,57 @@
 #!/bin/bash
 
-#
-# SCRIPT DE ESPERA DE RESPOSTA - VERSÃO BASH/SHELL
-# 
-# Descrição: Editor usando vim para experiência completa de edição
-# Linguagem: Bash Shell Script
-# Versão: 7.2-bash - Editor Vim Otimizado UX
-# Data: 30 de setembro de 2025
-# 
-# Funcionalidades:
-# - Editor vim completo e profissional
-# - Navegação, edição, busca nativas do vim
-# - Suporte total a quebras de linha
-# - Salvamento automático no resultado
-# - Interface familiar para desenvolvedores
-#
+# Script de espera de resposta simplificado
+# Versão: 8.1 - Ultra Simples com Vim
+
+echo ""
+echo "🚀 SISTEMA DE RESPOSTA INTERATIVA"
+echo ""
+echo "[1] ▶️  Continuar com próxima tarefa"
+echo "[2] ⏸️  Parar e aguardar instrução" 
+echo "[3] 🔄 Tentar novamente"
+echo "[4] 📝 Editor Vim"
+echo ""
+echo -n "➤ Digite sua opção: "
+
+read opcao
+
+case "$opcao" in
+    "1")
+        echo "✅ Continuando..."
+        exit 0
+        ;;
+    "2")
+        echo "⏸️ Parando execução..."
+        exit 1
+        ;;
+    "3")
+        echo "🔄 Tentando novamente..."
+        exit 3
+        ;;
+    "4")
+        echo "📝 Digite seu texto (Ctrl + C para finalizar):"
+        texto=$(cat)
+
+        if [ -n "$texto" ]; then
+            echo ""
+            echo "✅ Texto capturado:"
+            echo "$texto"
+            exit 3
+        else
+            echo "❌ Texto vazio, voltando ao menu..."
+            exec "$0"
+        fi
+        ;;
+    *)
+        if [ -n "$opcao" ]; then
+            echo "📝 Processando: $opcao"
+            exit 3
+        else
+            echo "❌ Opção inválida!"
+            exec "$0"
+        fi
+        ;;
+esac
 
 # Definições de segurança
 readonly MAX_INPUT_SIZE=8192
@@ -35,14 +72,75 @@ clear_screen() {
     printf "\033[2J\033[H"
 }
 
+# Função para editor de texto simples (fallback)
+simple_text_editor() {
+    local result=""
+    
+    clear_screen
+    printf "${BLUE}╔══════════════════════════════════════════════════════════════════╗${NC}\n"
+    printf "${BLUE}║${NC}                  ${BOLD}${WHITE}📝 EDITOR DE TEXTO SIMPLES${NC}                     ${BLUE}║${NC}\n"
+    printf "${BLUE}╚══════════════════════════════════════════════════════════════════╝${NC}\n"
+    
+    printf "\n${CYAN}💡 Editor Alternativo:${NC}\n"
+    printf "• ${GREEN}Digite seu texto${NC} (múltiplas linhas permitidas)\n"
+    printf "• ${GREEN}Finalizar:${NC} Digite 'EOF' em linha separada\n"
+    printf "• ${RED}Cancelar:${NC} Digite 'CANCEL' em linha separada\n"
+    
+    printf "\n${YELLOW}📝 Digite seu texto (termine com 'EOF'):${NC}\n"
+    printf "${BLUE}┌────────────────────────────────────────────────────────────────┐${NC}\n"
+    
+    local line_count=0
+    local text_content=""
+    
+    while true; do
+        printf "${BLUE}│${NC} "
+        read -r line
+        
+        # Verificar comandos de controle
+        if [ "$line" = "EOF" ]; then
+            break
+        elif [ "$line" = "CANCEL" ]; then
+            printf "${BLUE}└────────────────────────────────────────────────────────────────┘${NC}\n"
+            printf "\n${YELLOW}⚠️  Edição cancelada${NC}\n"
+            return 1
+        fi
+        
+        # Adicionar linha ao conteúdo
+        if [ $line_count -eq 0 ]; then
+            text_content="$line"
+        else
+            text_content="$text_content"$'\n'"$line"
+        fi
+        line_count=$((line_count + 1))
+        
+        # Verificar limite de linhas para evitar spam
+        if [ $line_count -gt 100 ]; then
+            printf "${BLUE}└────────────────────────────────────────────────────────────────┘${NC}\n"
+            printf "\n${RED}❌ Limite de 100 linhas atingido${NC}\n"
+            return 1
+        fi
+    done
+    
+    printf "${BLUE}└────────────────────────────────────────────────────────────────┘${NC}\n"
+    
+    # Verificar se há conteúdo válido
+    if [ -z "$text_content" ] || [ "$(echo "$text_content" | tr -d '[:space:]')" = "" ]; then
+        printf "\n${YELLOW}⚠️  Nenhum conteúdo válido inserido${NC}\n"
+        return 1
+    fi
+    
+    echo "$text_content"
+    return 0
+}
+
 # Função para mostrar menu principal
 show_main_menu() {
     clear_screen
     
     printf "${CYAN}╔══════════════════════════════════════════════════════════════════╗${NC}\n"
     printf "${CYAN}║${NC}                                                                  ${CYAN}║${NC}\n"
-    printf "${CYAN}║${NC}           ${BOLD}${WHITE}🚀 SISTEMA DE RESPOSTA INTERATIVA V7.2${NC}             ${CYAN}║${NC}\n"
-    printf "${CYAN}║${NC}                 ${WHITE}Editor Vim Otimizado UX${NC}                        ${CYAN}║${NC}\n"
+    printf "${CYAN}║${NC}           ${BOLD}${WHITE}🚀 SISTEMA DE RESPOSTA INTERATIVA V7.3${NC}             ${CYAN}║${NC}\n"
+    printf "${CYAN}║${NC}                 ${WHITE}Editor Vim + Fallback Melhorado${NC}                   ${CYAN}║${NC}\n"
     printf "${CYAN}║${NC}                                                                  ${CYAN}║${NC}\n"
     printf "${CYAN}╠══════════════════════════════════════════════════════════════════╣${NC}\n"
     printf "${CYAN}║${NC}                                                                  ${CYAN}║${NC}\n"
@@ -53,26 +151,51 @@ show_main_menu() {
     printf "${CYAN}║${NC}    ${YELLOW}[3]${NC} 🔄 Tentar novamente                                   ${CYAN}║${NC}\n"
     printf "${CYAN}║${NC}                                                                  ${CYAN}║${NC}\n"
     printf "${CYAN}║${NC}    ${BLUE}[4]${NC} 📝 Editor Vim (edição completa de texto)             ${CYAN}║${NC}\n"
+    printf "${CYAN}║${NC}    ${BLUE}[5]${NC} ✏️  Editor Simples (alternativa ao vim)              ${CYAN}║${NC}\n"
     printf "${CYAN}║${NC}                                                                  ${CYAN}║${NC}\n"
     printf "${CYAN}╚══════════════════════════════════════════════════════════════════╝${NC}\n"
     
-    printf "\n${CYAN}🎯 VERSÃO 7.2 - EDITOR VIM OTIMIZADO:${NC}\n"
-    printf "• ${BLUE}[4]${NC} Abre vim vazio, já em modo de edição!\n"
-    printf "• Nova UX: sem placeholder, entrada direta\n"
-    printf "• Salvamento: :wq (salvar e sair)\n"
+    printf "\n${CYAN}🎯 VERSÃO 7.3 - MELHORIAS:${NC}\n"
+    printf "• ${BLUE}[4]${NC} Vim com verificações robustas\n"
+    printf "• ${BLUE}[5]${NC} Editor alternativo caso vim falhe\n"
+    printf "• Arquivos temporários únicos\n"
+    printf "• Tratamento de erros melhorado\n"
     
     printf "\n${BOLD}${WHITE}➤ Digite sua opção:${NC} "
+}
+
+# Função para verificar se vim está disponível
+check_vim_available() {
+    if ! command -v vim >/dev/null 2>&1; then
+        printf "\n${RED}❌ Erro: vim não está instalado no sistema!${NC}\n"
+        printf "${YELLOW}💡 Instale com: sudo apt install vim${NC}\n"
+        printf "\n${BOLD}${WHITE}Pressione Enter para voltar ao menu...${NC}"
+        read -r
+        return 1
+    fi
+    return 0
 }
 
 # Função para editor usando vim
 vim_text_editor() {
     local result=""
     
-    # Criar arquivo temporário vazio para vim (sem placeholder)
-    touch "$TEMP_FILE" 2>/dev/null || {
-        echo "Erro: Não foi possível criar arquivo temporário"
+    # Verificar se vim está disponível
+    if ! check_vim_available; then
         return 1
-    }
+    fi
+    
+    # Criar arquivo temporário com nome único para evitar conflitos
+    local temp_file="/tmp/esperar_resposta_$$_$(date +%s).txt"
+    
+    # Criar arquivo temporário vazio para vim (sem placeholder)
+    if ! touch "$temp_file" 2>/dev/null; then
+        printf "\n${RED}❌ Erro: Não foi possível criar arquivo temporário${NC}\n"
+        printf "${YELLOW}💡 Verifique permissões da pasta /tmp${NC}\n"
+        printf "\n${BOLD}${WHITE}Pressione Enter para voltar ao menu...${NC}"
+        read -r
+        return 1
+    fi
     
     clear_screen
     printf "${YELLOW}╔══════════════════════════════════════════════════════════════════╗${NC}\n"
@@ -89,44 +212,49 @@ vim_text_editor() {
     printf "\n${BOLD}${GREEN}Pressione Enter para abrir o vim...${NC}"
     read -r
     
-    # Abrir vim com configuração de entrada automática
-    vim "+startinsert" "$TEMP_FILE"
-    local vim_result=$?
-    
-    # Verificar se usuário cancelou
-    if [ $vim_result -ne 0 ]; then
-        rm -f "$TEMP_FILE"
+    # Verificar se arquivo ainda existe antes de abrir vim
+    if [ ! -f "$temp_file" ]; then
+        printf "\n${RED}❌ Erro: Arquivo temporário foi perdido${NC}\n"
         return 1
     fi
     
-    # Verificar se arquivo existe e tem conteúdo
-    if [ ! -f "$TEMP_FILE" ]; then
+    # Abrir vim com configuração mais simples e tratamento de erro
+    printf "\n${GREEN}🚀 Abrindo vim...${NC}\n"
+    sleep 1
+    
+    # Tentar vim sem startinsert primeiro para evitar problemas de terminal
+    if vim "$temp_file" </dev/tty >/dev/tty 2>&1; then
+        vim_success=true
+    else
+        printf "\n${RED}❌ Erro: Falha ao executar o vim${NC}\n"
+        rm -f "$temp_file"
+        printf "\n${BOLD}${WHITE}Pressione Enter para voltar ao menu...${NC}"
+        read -r
         return 1
     fi
     
-    # Ler o arquivo resultante e verificar se tem conteúdo válido
-    local has_content=false
-    while IFS= read -r line || [ -n "$line" ]; do
-        # Verificar se tem conteúdo real (não apenas espaços/tabs)
-        if [[ "$line" =~ [^[:space:]] ]]; then
-            has_content=true
-            break
-        fi
-    done < "$TEMP_FILE"
-    
-    if [ "$has_content" = false ]; then
-        rm -f "$TEMP_FILE"
+    # Verificar se arquivo ainda existe após edição
+    if [ ! -f "$temp_file" ]; then
+        printf "\n${YELLOW}⚠️  Arquivo não foi salvo (usuário cancelou)${NC}\n"
         return 1
     fi
     
-    # Ler todo o conteúdo
-    result=$(cat "$TEMP_FILE")
+    # Verificar tamanho do arquivo primeiro (mais eficiente)
+    if [ ! -s "$temp_file" ]; then
+        rm -f "$temp_file"
+        printf "\n${YELLOW}⚠️  Arquivo vazio (nenhum conteúdo inserido)${NC}\n"
+        return 1
+    fi
+    
+    # Ler todo o conteúdo de uma vez
+    result=$(cat "$temp_file" 2>/dev/null)
     
     # Limpar arquivo temporário
-    rm -f "$TEMP_FILE"
+    rm -f "$temp_file"
     
-    # Verificar se tem conteúdo válido
-    if [ -z "$result" ] || [[ ! "$result" =~ [^[:space:]] ]]; then
+    # Verificar se tem conteúdo válido (não apenas whitespace)
+    if [ -z "$result" ] || [ "$(echo "$result" | tr -d '[:space:]')" = "" ]; then
+        printf "\n${YELLOW}⚠️  Conteúdo contém apenas espaços em branco${NC}\n"
         return 1
     fi
     
@@ -180,7 +308,18 @@ main() {
                 if result=$(vim_text_editor); then
                     response="$result"
                 else
-                    printf "\n${YELLOW}⚠️  Editor cancelado ou texto vazio. Pressione Enter para voltar...${NC}"
+                    printf "\n${YELLOW}⚠️  Editor Vim cancelado ou falhou.${NC}\n"
+                    printf "${CYAN}💡 Experimente a opção [5] para editor simples${NC}\n"
+                    printf "\n${BOLD}${WHITE}Pressione Enter para voltar...${NC}"
+                    read -r
+                fi
+                ;;
+            "5")
+                if result=$(simple_text_editor); then
+                    response="$result"
+                else
+                    printf "\n${YELLOW}⚠️  Editor simples cancelado ou texto vazio.${NC}\n"
+                    printf "\n${BOLD}${WHITE}Pressione Enter para voltar...${NC}"
                     read -r
                 fi
                 ;;
