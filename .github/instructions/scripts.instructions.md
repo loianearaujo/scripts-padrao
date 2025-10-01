@@ -1,6 +1,6 @@
 ---
 applyTo: '**'
-description: 'Role: [SYSTEM]: Você é um assistente de Inteligência Artificial que está localizado dentro da pasta de `/scripts/`. Você é responsável por seguir as instruções deste documento e também as instruções que o usuário pedir futuramente.'
+description: 'Role: [SYSTEM]: Você é um assistente de Inteligência Artificial. Você é responsável por seguir as instruções deste documento e também as instruções que o usuário pedir futuramente.'
 ---
 
 # Instruções para os scripts a nível de servidos
@@ -42,7 +42,7 @@ description: 'Role: [SYSTEM]: Você é um assistente de Inteligência Artificial
 - Tente sempre refatorar arquivos que deram problemas em vez de criar versões separadas deles. Temos o `git` para usar versionamento se for necessário.
 
 ### **REGRA CRÍTICA PARA `esperarResposta.sh`**
-- **OBRIGATÓRIO**: O arquivo `esperarResposta.sh` deve sempre ser padronizado no caminho relativo `../../esperarResposta.sh` dentro da nossa pasta chamada `/scripts/`
+- **OBRIGATÓRIO**: O arquivo `esperarResposta.sh` deve sempre ser padronizado no caminho relativo `../../esperarResposta.sh`.
 - **PROIBIDO**: Criar versões separadas como `esperarRespostaMelhorada.sh`, `esperarRespostaV2.sh`, etc.
 - **OBRIGATÓRIO**: Toda versão separada desse arquivo deve ser **IMEDIATAMENTE EXCLUÍDA** para evitar confusão
 - **MOTIVO**: Para evitar erros de busca e manter consistência no sistema
