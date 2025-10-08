@@ -3,19 +3,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 // Template de arquivo otimizado (carregado uma única vez)
-const TEMPLATE_CONTENT = `# Instruções para o Assistente GitHub Copilot
-
-💡 Dica: Digite suas instruções abaixo, salve o arquivo (Ctrl+S) e FECHE esta aba para continuar.
-
-## LISTA DE TAREFAS 📃
-
-- (1) Exemplo de tarefa 1
-- (2) Exemplo de tarefa 2
-
-## FIM DAS INSTRUÇÕES
-
-⚠️  IMPORTANTE: Após editar, salve (Ctrl+S) e FECHE esta aba para que o script continue!
-`;
+const TEMPLATE_CONTENT = ` `;
 
 // Verificação rápida e otimizada do ambiente
 function checkEnvironment() {
