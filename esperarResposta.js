@@ -3,7 +3,14 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 // Template de arquivo otimizado (carregado uma única vez)
-const TEMPLATE_CONTENT = ` `;
+const TEMPLATE_CONTENT = `# Instruções para o Assistente GitHub Copilot
+
+## LISTA DE TAREFAS 📃
+
+
+- Ao final, reexecute as instruções do arquivo /C:/Users/loian/AppData/Roaming/Code/User/prompts/instrucoes-globais.instructions.md
+## FIM DAS INSTRUÇÕES
+`;
 
 // Verificação rápida e otimizada do ambiente
 function checkEnvironment() {
